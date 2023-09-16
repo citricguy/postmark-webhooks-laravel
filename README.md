@@ -43,4 +43,7 @@ php artisan vendor:publish --provider="Citricguy\PostmarkWebhooks\PostmarkWebhoo
 ```
 
 Here you can change the API endpoint.  By default, the webhook_path is set to `/api/postmark/webhook`.
-You can also configure the API endpoint by using POSTMARK_WEBHOOK_PATH in your .env file. (i.e. `POSTMARK_WEBHOOK_PATH="/api/postmark/a-different-webhook"`)
+You can also configure the API endpoint by using `POSTMARK_WEBHOOK_PATH` in your `.env` file. (i.e. `POSTMARK_WEBHOOK_PATH="/api/postmark/a-different-webhook"`)
+
+### Middleware/Firewall
+There is a middleware that filters IPs that are not from Postmark. While your app is being developed locally (.env = APP_ENV=local) this middleware will not function. Once your app is in production however, the filtering will be enabled.
