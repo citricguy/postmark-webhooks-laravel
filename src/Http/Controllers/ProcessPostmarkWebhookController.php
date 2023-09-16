@@ -15,12 +15,7 @@ class ProcessPostmarkWebhookController
         $messageId = $request->input('MessageID');
         $email = $request->input('Recipient') ?? $request->input('Email');
 
-        new PostmarkWebhookReceived(
-            email: $email,
-            recordType: $recordType,
-            messageId: $messageId,
-            payload: $payload
-        );
+        PostmarkWebhookReceived::dispatch($email, $recordType, $messageId, $payload);
 
         return response()->json(['success'])->setStatusCode(202);
     }
