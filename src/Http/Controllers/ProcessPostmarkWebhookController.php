@@ -4,7 +4,6 @@ namespace Citricguy\PostmarkWebhooks\Http\Controllers;
 
 use Citricguy\PostmarkWebhooks\Events\PostmarkWebhookReceived;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 
 class ProcessPostmarkWebhookController
 {

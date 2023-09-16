@@ -3,7 +3,6 @@
 namespace Citricguy\PostmarkWebhooks\Events;
 
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Support\Facades\Log;
 
 class PostmarkWebhookReceived
 {
