@@ -13,7 +13,14 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Citricguy\\PostmarkWebhooksLaravel\\": "src/"
+            "Citricguy\\PostmarkWebhooks\\": "src/"
+        }
+    },
+    "extra" : {
+        "laravel": {
+            "providers": [
+                "Citricguy\\PostmarkWebhooks\\PostmarkWebhooksServiceProvider"
+            ]
         }
     },
     "authors": [
