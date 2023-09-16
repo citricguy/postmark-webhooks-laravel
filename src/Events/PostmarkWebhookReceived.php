@@ -28,7 +28,5 @@ class PostmarkWebhookReceived
         $this->recordType = $recordType;
         $this->messageId = $messageId;
         $this->payload = $payload;
-
-        Log::info('Event Fired');
     }
 }
