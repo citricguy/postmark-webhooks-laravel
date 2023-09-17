@@ -16,6 +16,11 @@
             "Citricguy\\PostmarkWebhooks\\": "src/"
         }
     },
+"autoload-dev": {
+        "psr-4": {
+            "Citricguy\\PostmarkWebhooks\\Tests\\": "tests/"
+        }
+    },
     "extra": {
         "laravel": {
             "providers": [
@@ -29,5 +34,8 @@
             "email": "citricguy@gmail.com"
         }
     ],
-    "minimum-stability": "stable"
+    "minimum-stability": "stable",
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    }
 }

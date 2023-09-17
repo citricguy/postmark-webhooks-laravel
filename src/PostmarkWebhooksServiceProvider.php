@@ -2,6 +2,7 @@
 
 namespace Citricguy\PostmarkWebhooks;
 
+
 use Citricguy\PostmarkWebhooks\Http\Controllers\ProcessPostmarkWebhookController;
 use Citricguy\PostmarkWebhooks\Http\Middleware\VerifyPostmarkWebhookIPAddresses;
 use Illuminate\Support\Facades\Route;
