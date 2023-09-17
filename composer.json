@@ -16,7 +16,7 @@
             "Citricguy\\PostmarkWebhooks\\": "src/"
         }
     },
-    "extra" : {
+    "extra": {
         "laravel": {
             "providers": [
                 "Citricguy\\PostmarkWebhooks\\PostmarkWebhooksServiceProvider"
@@ -29,5 +29,5 @@
             "email": "citricguy@gmail.com"
         }
     ],
-    "minimum-stability": "dev"
+    "minimum-stability": "stable"
 }
