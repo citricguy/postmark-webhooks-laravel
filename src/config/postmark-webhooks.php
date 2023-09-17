@@ -9,10 +9,10 @@ return [
     'webhook_path' => env('POSTMARK_WEBHOOK_PATH', '/api/postmark/webhook'),
 
     /*
-     * By default, postmark-webhooks must come from a valid Postmark IP address.
-     * When running outside of production (ie., local, staging, etc) this is disabled.
+     * By default, postmark-webhooks must come from a valid Postmark IP address and might require basic-auth.
      *
-     * If you need to disable the IP check in production, set this value to `false`.
+     * This is disabled by default if you are not in a production environment, however, you can disable IP and
+     * basic-auth checks in production by setting this to false.
      */
     'firewall_enabled' => env('POSTMARK_WEBHOOK_FIREWALL_ENABLED', true),
 

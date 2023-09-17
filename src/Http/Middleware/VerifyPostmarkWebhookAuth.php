@@ -6,11 +6,11 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
-class VerifyPostmarkWebhookIPAddresses
+class VerifyPostmarkWebhookAuth
 {
 
     /**
-     * Array of IP addresses from Postmark that are white listed.
+     * Array of IP addresses from Postmark that are whitelisted.
      *
      * @see https://postmarkapp.com/support/article/800-ips-for-firewalls#webhooks
      *

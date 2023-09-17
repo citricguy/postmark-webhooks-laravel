@@ -29,7 +29,6 @@ class PostmarkWebhooksTest extends TestCase
         ], $attributes);
     }
 
-    // @todo find a better way to setup this test
     public function test_middleware_blocks_non_postmark_ips_in_production()
     {
         app()->detectEnvironment(function() { return 'production'; });
@@ -38,7 +37,6 @@ class PostmarkWebhooksTest extends TestCase
         Event::assertNotDispatched(PostmarkWebhookReceived::class);
     }
 
-    // @todo find a better way to setup this test
     public function test_middleware_does_not_block_outside_of_production()
     {
         app()->detectEnvironment(function() { return 'local'; });
@@ -47,7 +45,6 @@ class PostmarkWebhooksTest extends TestCase
         Event::assertDispatched(PostmarkWebhookReceived::class);
     }
 
-    // @todo find a better way to setup this test
     public function test_middleware_allows_known_good_postmark_ips_in_production()
     {
         app()->detectEnvironment(function() { return 'production'; });
@@ -57,8 +54,6 @@ class PostmarkWebhooksTest extends TestCase
         Event::assertDispatched(PostmarkWebhookReceived::class);
     }
 
-    // @todo find a better way to setup this test
-    // @todo find a better way to cleanup after this test
     public function test_that_config_is_publishable()
     {
         $this->assertFileDoesNotExist(config_path('postmark-webhooks.php'));
@@ -71,7 +66,6 @@ class PostmarkWebhooksTest extends TestCase
         $this->assertFileDoesNotExist(config_path('postmark-webhooks.php'));
     }
 
-    // @todo find a better way to setup this test
     public function test_that_postmark_ip_firewall_can_be_disabled_using_config()
     {
         app()->detectEnvironment(function() { return 'production'; });
@@ -83,7 +77,6 @@ class PostmarkWebhooksTest extends TestCase
         Event::assertDispatched(PostmarkWebhookReceived::class);
     }
 
-    // @todo find a better way to setup this test
     public function test_postmark_webhook_path_is_configurable_using_config()
     {
 

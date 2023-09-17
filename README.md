@@ -1,9 +1,11 @@
 # Postmark Webhooks for Laravel
-This is a very simple API that makes PostmarkApp webhooks available to Laravel using events and listeners.
+This simple package enables a PostmarkApp webhook callback on your Laravel site. 
+
+To interact with the webhooks you will need to attach a listener to the `PostmarkWebhookReceived::class` event.
 
 ## Installation
 
-You can install the package via composer:
+You can install this package using composer:
 
 ``` bash
 composer require citricguy/laravel-postmark-webhooks
@@ -11,16 +13,20 @@ composer require citricguy/laravel-postmark-webhooks
 
 ## Configure webhooks in your Postmark account
 
-On the servers page of your [Postmark](https://account.postmarkapp.com/) account select the server and then the appropriate stream you would use with your laravel project.
+On the servers page of your Postmark account choose the server and stream you would like to receive webhooks from.
 
-Next go to 'settings', then 'webhooks' and finally 'add webhook'.
+Once there, go to 'settings' -> 'webhooks' -> 'add webhook'.
 
-Add your sites URL and then the path to the webhook, which is `/api/postmark/webhook` by default. (i.e. `https://<your-domain.com>/api/postmark/webhook`)
+Add your webhook URL which is `https://<your-domain.com>/api/postmark/webhook` by default.
 
-Pick the events Postmark should send to you and save the webhook.
+Select the events Postmark should send to your webhook and then save.
 
-### Event Setup
-To interact with the webhooks you will be using event listeners.  This package will fire a `PostmarkWebhookReceived` event for every webhook call.  You may register an event listener in the `EventServiceProvider`:
+## Event Configuration
+Listening for the `PostmarkWebhookReceived` event is the primary way we'll interact with the webhooks.
+
+If you haven't used events or listener before, please see the laravel documentation regarding [events](https://laravel.com/docs/10.x/events).
+
+In short, we'll create a listener, register it in our `EventServiceProvider` and then handle the event in our listener.
 ```php
 /**
  * The event listener mappings for the application.
@@ -34,16 +40,88 @@ protected $listen = [
 ];
 ```
 
-### Configuration
+Here is an example listener: 
 
-Though not necessary, if you would like to modify the default settings you can publish the config file to your project:
+```php
+<?php
+
+namespace App\Listeners;
+
+use Citricguy\PostmarkWebhooks\Events\PostmarkWebhookReceived;
+class ProcessPostmarkWebhooks
+{
+    /**
+     * Create the event listener.
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Handle the event.
+     */
+    public function handle(PostmarkWebhookReceived $event): void
+    {
+
+        // Do your work here.
+
+        // You can access the payload here with: $event->payload.
+        // The email address, message ID and record type are also available:
+        // $event->email;
+        // $event->recordType;
+        // $event->messageId;
+        
+    }
+}
+```
+
+## Advanced Configuration
+
+Though not necessary, if you would like to configure the webhook's path, basic-auth or disable the auth middleware you can publish the config file.
 
 ```bash
 php artisan vendor:publish --provider="Citricguy\PostmarkWebhooks\PostmarkWebhooksServiceProvider" --tag="config"
 ```
 
-Here you can change the API endpoint.  By default, the webhook_path is set to `/api/postmark/webhook`.
-You can also configure the API endpoint by using `POSTMARK_WEBHOOK_PATH` in your `.env` file. (i.e. `POSTMARK_WEBHOOK_PATH="/api/postmark/a-different-webhook"`)
+You can change your settings in that config, or use your .env file instead if you prefer. 
 
-### Middleware/Firewall
-There is a middleware that filters IPs that are not from Postmark. While your app is not in production (.env != APP_ENV=production) this middleware will not function. Once your app is in production however, the filtering will be enabled.
+The following .env values are available:
+
+```dotenv
+POSTMARK_WEBHOOK_PATH=/api/postmark/webhook
+POSTMARK_WEBHOOK_FIREWALL_ENABLED=true
+POSTMARK_WEBHOOK_AUTH_USER=
+POSTMARK_WEBHOOK_AUTH_PASS=
+```
+
+## About the Firewall
+By default, the firewall is disabled unless you are in a 'production' environment. (i.e. `APP_ENV=production`).
+
+The middleware will do 'basic-auth' if configured. To use this feature, you will need to configure your Postmark webhook to include Basic auth credentials by configuring your wehbook on PostmarkApp.com.
+
+Finally, you will need to set up your .env file:
+
+```dotenv
+POSTMARK_WEBHOOK_AUTH_USER=<username matching webhook configuration>
+POSTMARK_WEBHOOK_AUTH_PASS=<password matching webhook configuration>
+```
+
+The middleware also confirms the source of the webhook is from PostmarkApp.com. This is done by checking the IP address of the request against the [list of IP addresses](https://postmarkapp.com/support/article/800-ips-for-firewalls#webhooks) provided by PostmarkApp.com.
+
+To disable the firewall, set `POSTMARK_WEBHOOK_FIREWALL_ENABLED=false` in your .env file or simply be in any environment except for production.
+
+## Testing
+
+``` bash
+$ composer test
+```
+
+## Credits
+
+Inspired by [Laravel Postmark Webooks](https://github.com/mvdnbrk/laravel-postmark-webhooks). This project is a simpler alternative that does not include any models or migrations. It also allows for basic-auth webhook integration with PostmarkApp.
+
+
+## License
+
+The MIT License (MIT). Please see [License File](LICENSE.md) for more information.

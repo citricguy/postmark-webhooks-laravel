@@ -4,7 +4,7 @@ namespace Citricguy\PostmarkWebhooks;
 
 
 use Citricguy\PostmarkWebhooks\Http\Controllers\ProcessPostmarkWebhookController;
-use Citricguy\PostmarkWebhooks\Http\Middleware\VerifyPostmarkWebhookIPAddresses;
+use Citricguy\PostmarkWebhooks\Http\Middleware\VerifyPostmarkWebhookAuth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -37,7 +37,7 @@ class PostmarkWebhooksServiceProvider extends ServiceProvider
         return [
             'middleware' => [
                 'api',
-                VerifyPostmarkWebhookIPAddresses::class,
+                VerifyPostmarkWebhookAuth::class,
             ],
         ];
     }
