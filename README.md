@@ -1,7 +1,11 @@
 # Postmark Webhooks for Laravel
-This simple package enables a PostmarkApp webhook callback on your Laravel site. 
+You want to accept webhooks from PostmarkApp.com for eamils you have sent. This package makes it easy to do that.
 
-To interact with the webhooks you will need to attach a listener to the `PostmarkWebhookReceived::class` event.
+This no-frills package will allow you to accept webhooks from PostmarkApp.com and then fire an event that you can listen for in your application. 
+
+There are no added migrations, no models, only a single event that you can listen for and then do whatever you want with the payload.
+
+It is configurable, easy to use and has middleware firewall to ensure the webhooks are coming from PostmarkApp.com.
 
 ## Installation
 
