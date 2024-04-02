@@ -10,8 +10,8 @@ It is configurable, easy to use and utilizes middleware to ensure the webhooks a
 Because we're starting fresh and trying to keep this as maintainable and reliable as possible, we're using the latest version of Laravel and PHP. 
 
 ### Requirements
-- Laravel 10.x
-- PHP 8.2
+- Laravel 10.x|11.x
+- PHP 8.2|8.3
 - An active PostmarkApp.com account.
 
 ## Installation
@@ -27,14 +27,14 @@ On the servers page of your Postmark account choose the server and stream you wo
 
 Once there, go to 'settings' -> 'webhooks' -> 'add webhook'.
 
-Add your webhook URL which is `https://<your-domain.com>/api/postmark/webhook` by default.
+Add your webhook URL which is `https://<your-domain.com>/api/postmark/webhook` by default (this is configurable).
 
 Select the events Postmark should send to your webhook and then save.
 
 ## Event Configuration
 Listening for the `PostmarkWebhookReceived` event is the primary way we'll interact with the webhooks.
 
-If you haven't used events or listener before, please see the laravel documentation regarding [events](https://laravel.com/docs/10.x/events).
+If you haven't used events or listener before, please see the laravel documentation regarding [events](https://laravel.com/docs/11.x/events).
 
 In short, we'll create a listener, register it in our `EventServiceProvider` and then handle the event in our listener.
 ```php
@@ -74,10 +74,10 @@ class ProcessPostmarkWebhooks
     public function handle(PostmarkWebhookReceived $event): void
     {
 
-        // Do your work here.
+        // Process Webhook Data Here.
 
-        // You can access the payload here with: $event->payload.
-        // The email address, message ID and record type are also available:
+        // Access the PostmarkApp payload using: $event->payload.
+        // The email address, record type and message ID are also made available:
         // $event->email;
         // $event->recordType;
         // $event->messageId;
@@ -129,7 +129,7 @@ $ composer test
 
 ## Credits
 
-Inspired by [Laravel Postmark Webooks](https://github.com/mvdnbrk/laravel-postmark-webhooks). This project is a simpler alternative that does not include any models or migrations. It also allows for basic-auth webhook integration with PostmarkApp.
+This project was inspired by [Laravel Postmark Webooks](https://github.com/mvdnbrk/laravel-postmark-webhooks). This project is a simpler alternative to that project that does not include any models or migrations. It also allows for basic-auth webhook integration with PostmarkApp while trying to keep up with current versions of Laravel and PHP.
 
 
 ## License
