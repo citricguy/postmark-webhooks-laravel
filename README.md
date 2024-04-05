@@ -129,7 +129,7 @@ $ composer test
 
 ## Credits
 
-This project was inspired by [Laravel Postmark Webooks](https://github.com/mvdnbrk/laravel-postmark-webhooks). This project is a simpler alternative to that project that does not include any models or migrations. It also allows for basic-auth webhook integration with PostmarkApp while trying to keep up with current versions of Laravel and PHP.
+This project was inspired by [Laravel Postmark Webooks](https://github.com/mvdnbrk/laravel-postmark-webhooks) and is a simpler alternative without any added models or migrations. It also allows for basic-auth webhook integration with PostmarkApp while trying to keep up with current versions of Laravel and PHP.
 
 
 ## License
