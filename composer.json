@@ -3,8 +3,7 @@
     "description": "Allow your Laravel project to listen for webhooks sent from PostmarkApp.",
     "type": "laravel-package",
     "require": {
-        "php": "^8.2|^8.3",
-        "illuminate/support": "^10.0|^11.0"
+        "php": "^8.2|^8.3"
     },
     "require-dev": {
         "orchestra/testbench": "^8.0|^9.0",
