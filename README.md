@@ -18,7 +18,7 @@ Because we're starting fresh and trying to keep this as maintainable and reliabl
 You can install this package using composer:
 
 ``` bash
-composer require citricguy/laravel-postmark-webhooks
+composer require citricguy/postmark-webhooks-laravel
 ```
 
 ## Configure webhooks in your Postmark account
