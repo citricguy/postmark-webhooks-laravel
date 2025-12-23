@@ -12,9 +12,9 @@ abstract class TestCase extends Orchestra
      * Get package providers.
      *
      * @param  Application  $app
-     * @return array
+     * @return array<int, class-string>
      */
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
             PostmarkWebhooksServiceProvider::class,

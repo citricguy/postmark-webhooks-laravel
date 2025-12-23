@@ -3,11 +3,14 @@
     "description": "Allow your Laravel project to listen for webhooks sent from PostmarkApp.",
     "type": "laravel-package",
     "require": {
-        "php": "^8.2|^8.3"
+        "php": "^8.3"
     },
     "require-dev": {
-        "orchestra/testbench": "^8.0|^9.0",
-        "pestphp/pest": "^1.20|^2.0"
+        "larastan/larastan": "^3.0",
+        "laravel/pint": "^1.0",
+        "orchestra/testbench": "^10.0",
+        "pestphp/pest": "^4.0",
+        "phpstan/phpstan": "^2.0"
     },
     "license": "MIT",
     "autoload": {
@@ -36,7 +39,11 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "scripts": {
-        "test": "vendor/bin/pest"
+        "test": "vendor/bin/pest",
+        "test:lint": "vendor/bin/pint --test",
+        "test:analyse": "vendor/bin/phpstan analyse --memory-limit=2G",
+        "lint": "vendor/bin/pint",
+        "analyse": "vendor/bin/phpstan analyse --memory-limit=2G"
     },
     "config": {
         "allow-plugins": {

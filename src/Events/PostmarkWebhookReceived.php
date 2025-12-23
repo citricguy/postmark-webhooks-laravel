@@ -6,21 +6,20 @@ use Illuminate\Foundation\Events\Dispatchable;
 
 class PostmarkWebhookReceived
 {
-
     use Dispatchable;
 
-    /** @var string */
     public string $email;
 
-    /** @var string */
     public string $recordType;
 
-    /** @var string */
     public ?string $messageId;
 
-    /** @var array */
+    /** @var array<string, mixed> */
     public array $payload;
 
+    /**
+     * @param  array<string, mixed>  $payload
+     */
     public function __construct(string $email, string $recordType, ?string $messageId, array $payload)
     {
         $this->email = $email;

@@ -1,0 +1,26 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 8
+    paths:
+        - src
+        - tests
+    
+    # Exclude vendor and build files
+    excludePaths:
+        - */vendor/*
+        - */tests/Pest.php
+    
+    # Report unmatched ignored errors
+    reportUnmatchedIgnoredErrors: false
+    
+    # Config files are allowed to use env() - this is standard Laravel convention
+    ignoreErrors:
+        - message: '#Called .env. outside of the config directory#'
+          path: src/config/*
+        # Ignore Pest test bindings - PHPStan doesn't understand Pest's $this binding
+        - message: '#Access to an undefined property PHPUnit\\Framework\\TestCase::\$app\.#'
+          path: tests/*
+        - message: '#Call to an undefined method PHPUnit\\Framework\\TestCase::(postJson|artisan|refreshApplication)\(\)\.#'
+          path: tests/*

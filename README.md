@@ -7,11 +7,9 @@ There are no added migrations, no models, only a single event that you can liste
 
 It is configurable, easy to use and utilizes middleware to ensure the webhooks are coming from PostmarkApp.com.
 
-Because we're starting fresh and trying to keep this as maintainable and reliable as possible, we're using the latest version of Laravel and PHP. 
-
 ### Requirements
-- Laravel 10.x|11.x
-- PHP 8.2|8.3
+- Laravel 12.x
+- PHP 8.3|8.4|8.5
 - An active PostmarkApp.com account.
 
 ## Installation
@@ -123,9 +121,40 @@ To disable the firewall, set `POSTMARK_WEBHOOK_FIREWALL_ENABLED=false` in your .
 
 ## Testing
 
+Run the full test suite:
 ``` bash
-$ composer test
+composer test
 ```
+
+Run static analysis with PHPStan (level 8):
+``` bash
+composer analyse
+```
+
+Run code formatting checks with Laravel Pint:
+``` bash
+composer test:lint
+```
+
+Format code automatically:
+``` bash
+composer lint
+```
+
+Run all checks (tests, static analysis, linting):
+``` bash
+composer test:lint && composer test:analyse && composer test
+```
+
+## Development
+
+This package uses modern PHP tooling to ensure code quality:
+
+- **Pest 4** for testing
+- **PHPStan (level 8)** with Larastan for static analysis
+- **Laravel Pint** for code formatting
+
+All checks are run in CI across PHP 8.3, 8.4, and 8.5 with Laravel 12.
 
 ## Credits
 

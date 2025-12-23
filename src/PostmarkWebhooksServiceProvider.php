@@ -2,7 +2,6 @@
 
 namespace Citricguy\PostmarkWebhooks;
 
-
 use Citricguy\PostmarkWebhooks\Http\Controllers\ProcessPostmarkWebhookController;
 use Citricguy\PostmarkWebhooks\Http\Middleware\VerifyPostmarkWebhookAuth;
 use Illuminate\Support\Facades\Route;
@@ -10,7 +9,7 @@ use Illuminate\Support\ServiceProvider;
 
 class PostmarkWebhooksServiceProvider extends ServiceProvider
 {
-    public function boot()
+    public function boot(): void
     {
         $this->registerRoutes();
 
@@ -29,10 +28,13 @@ class PostmarkWebhooksServiceProvider extends ServiceProvider
     {
         Route::group($this->routeConfiguration(), function () {
             Route::post(config('postmark-webhooks.webhook_path'), ProcessPostmarkWebhookController::class)
-            ->name('postmark-webhooks.process-webhook');
+                ->name('postmark-webhooks.process-webhook');
         });
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     private function routeConfiguration(): array
     {
         return [
