@@ -9,10 +9,17 @@ class ProcessPostmarkWebhookController
 {
     public function __invoke(Request $request): \Illuminate\Http\JsonResponse
     {
+        /** @var array<string, mixed> $payload */
         $payload = $request->input();
-        $recordType = $request->input('RecordType');
+
+        /** @var string $recordType */
+        $recordType = $request->input('RecordType', '');
+
+        /** @var string|null $messageId */
         $messageId = $request->input('MessageID');
-        $email = $request->input('Recipient') ?? $request->input('Email');
+
+        /** @var string $email */
+        $email = $request->input('Recipient') ?? $request->input('Email') ?? '';
 
         PostmarkWebhookReceived::dispatch($email, $recordType, $messageId, $payload);
 
