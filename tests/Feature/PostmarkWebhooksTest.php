@@ -117,6 +117,15 @@ test('that type of subscription change uses recipient field for email address', 
     });
 });
 
+test('invalid webhook payloads are rejected instead of dispatching incomplete events', function () {
+    $response = $this->postJson('/api/postmark/webhook', [
+        'MessageID' => '1234',
+    ]);
+
+    $response->assertStatus(422);
+    Event::assertNotDispatched(PostmarkWebhookReceived::class);
+});
+
 test('that basic auth protection can be used for postmark webhooks', function () {
     $this->app['env'] = 'production'; // Middleware is skipped if not in production.
 

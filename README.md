@@ -126,7 +126,7 @@ Run the full test suite:
 composer test
 ```
 
-Run static analysis with PHPStan (level 8):
+Run static analysis with PHPStan (level 9):
 ``` bash
 composer analyse
 ```
@@ -151,7 +151,7 @@ composer test:lint && composer test:analyse && composer test
 This package uses modern PHP tooling to ensure code quality:
 
 - **Pest 4** for testing
-- **PHPStan (level 8)** with Larastan for static analysis
+- **PHPStan (level 9)** with Larastan for static analysis
 - **Laravel Pint** for code formatting
 
 All checks are run in CI across PHP 8.3, 8.4, and 8.5 with Laravel 12.

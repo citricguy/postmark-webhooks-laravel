@@ -12,17 +12,27 @@ class ProcessPostmarkWebhookController
         /** @var array<string, mixed> $payload */
         $payload = $request->input();
 
-        /** @var string $recordType */
-        $recordType = $request->input('RecordType', '');
+        $recordType = $this->stringValue($payload, 'RecordType');
+        $email = $this->stringValue($payload, 'Recipient') ?? $this->stringValue($payload, 'Email');
 
-        /** @var string|null $messageId */
-        $messageId = $request->input('MessageID');
+        if ($recordType === null || $email === null) {
+            return response()->json(['error' => 'Invalid Postmark webhook payload.'], 422);
+        }
 
-        /** @var string $email */
-        $email = $request->input('Recipient') ?? $request->input('Email') ?? '';
+        $messageId = $this->stringValue($payload, 'MessageID');
 
         PostmarkWebhookReceived::dispatch($email, $recordType, $messageId, $payload);
 
         return response()->json(['success'])->setStatusCode(202);
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    private function stringValue(array $payload, string $key): ?string
+    {
+        $value = $payload[$key] ?? null;
+
+        return is_string($value) && $value !== '' ? $value : null;
     }
 }
