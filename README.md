@@ -8,7 +8,7 @@ There are no added migrations, no models, only a single event that you can liste
 It is configurable, easy to use and utilizes middleware to ensure the webhooks are coming from PostmarkApp.com.
 
 ### Requirements
-- Laravel 12.x
+- Laravel 12.x or 13.x
 - PHP 8.3|8.4|8.5
 - An active PostmarkApp.com account.
 
@@ -32,7 +32,7 @@ Select the events Postmark should send to your webhook and then save.
 ## Event Configuration
 Listening for the `PostmarkWebhookReceived` event is the primary way we'll interact with the webhooks.
 
-If you haven't used events or listener before, please see the laravel documentation regarding [events](https://laravel.com/docs/11.x/events).
+If you haven't used events or listener before, please see the Laravel documentation regarding [events](https://laravel.com/docs/events).
 
 In short, we'll create a listener, register it in our `EventServiceProvider` and then handle the event in our listener.
 ```php
@@ -42,7 +42,7 @@ In short, we'll create a listener, register it in our `EventServiceProvider` and
  * @var array
  */
 protected $listen = [
-    PostmarkWebhookCalled::class => [
+    PostmarkWebhookReceived::class => [
         ListenerClasses::class, // Create with `php artisan make:listener <listener name>`
     ],
 ];
@@ -56,6 +56,7 @@ Here is an example listener:
 namespace App\Listeners;
 
 use Citricguy\PostmarkWebhooks\Events\PostmarkWebhookReceived;
+
 class ProcessPostmarkWebhooks
 {
     /**
@@ -154,7 +155,10 @@ This package uses modern PHP tooling to ensure code quality:
 - **PHPStan (level 9)** with Larastan for static analysis
 - **Laravel Pint** for code formatting
 
-All checks are run in CI across PHP 8.3, 8.4, and 8.5 with Laravel 12.
+All checks are run in CI across PHP 8.3, 8.4, and 8.5 with:
+
+- Laravel 12 + Testbench 10
+- Laravel 13 + Testbench 11
 
 ## Credits
 

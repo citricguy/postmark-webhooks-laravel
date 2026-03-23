@@ -6,9 +6,9 @@
         "php": "^8.3"
     },
     "require-dev": {
-        "larastan/larastan": "^3.0",
-        "laravel/pint": "^1.0",
-        "orchestra/testbench": "^10.0",
+        "larastan/larastan": "^3.9.3",
+        "laravel/pint": "^1.27",
+        "orchestra/testbench": "^10.11 || ^11.0",
         "pestphp/pest": "^4.0",
         "phpstan/phpstan": "^2.0"
     },
@@ -18,7 +18,7 @@
             "Citricguy\\PostmarkWebhooks\\": "src/"
         }
     },
-"autoload-dev": {
+    "autoload-dev": {
         "psr-4": {
             "Citricguy\\PostmarkWebhooks\\Tests\\": "tests/"
         }
