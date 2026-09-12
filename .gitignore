@@ -5,3 +5,8 @@ coverage
 vendor
 composer.lock
 .phpunit.result.cache
+/.build/
+/.phpunit.cache/
+/.phpunit-watcher.yml
+/.pest/
+/.pint.cache

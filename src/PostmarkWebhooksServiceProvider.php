@@ -27,8 +27,10 @@ class PostmarkWebhooksServiceProvider extends ServiceProvider
     private function registerRoutes(): void
     {
         Route::group($this->routeConfiguration(), function () {
-            /** @var string $webhookPath */
             $webhookPath = config('postmark-webhooks.webhook_path', '/api/postmark/webhook');
+            if (! is_string($webhookPath)) {
+                throw new \InvalidArgumentException('postmark-webhooks.webhook_path must be a string.');
+            }
             Route::post($webhookPath, ProcessPostmarkWebhookController::class)
                 ->name('postmark-webhooks.process-webhook');
         });

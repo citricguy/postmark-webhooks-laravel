@@ -4,69 +4,57 @@ on:
   push:
     branches: [main, master]
   pull_request:
-    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: postmark-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
+  compatibility:
+    name: PHP ${{ matrix.php }} / Laravel ${{ matrix.laravel }} / ${{ matrix.resolution }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - php: '8.3'
-            laravel: '12.*'
-            testbench: '^10.11'
-            stability: prefer-stable
-          - php: '8.4'
-            laravel: '12.*'
-            testbench: '^10.11'
-            stability: prefer-stable
-          - php: '8.5'
-            laravel: '12.*'
-            testbench: '^10.11'
-            stability: prefer-stable
-          - php: '8.3'
-            laravel: '13.*'
-            testbench: '^11.0'
-            stability: prefer-stable
-          - php: '8.4'
-            laravel: '13.*'
-            testbench: '^11.0'
-            stability: prefer-stable
-          - php: '8.5'
-            laravel: '13.*'
-            testbench: '^11.0'
-            stability: prefer-stable
-
-    name: PHP ${{ matrix.php }} - Laravel ${{ matrix.laravel }} - ${{ matrix.stability }}
-
+        php: ['8.3', '8.4', '8.5']
+        laravel: ['12', '13']
+        resolution: [latest, lowest]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+          extensions: mbstring, curl, dom, xml, pdo_sqlite
           coverage: none
+          tools: composer:v2
+      - name: Test isolated consumer and shared regression suite
+        run: bash tools/check-matrix.sh '${{ matrix.laravel }}' '${{ matrix.resolution }}'
 
-      - name: Setup problem matchers
-        run: |
-          echo "::add-matcher::${{ runner.tool_cache }}/php.json"
-          echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
-
-      - name: Install dependencies
-        run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" --no-interaction --no-update
-          composer require "orchestra/testbench:${{ matrix.testbench }}" --dev --no-interaction --no-update
-          composer update --${{ matrix.stability }} --prefer-dist --no-interaction
-
-      - name: Execute tests (Pest)
-        run: composer test
-
-      - name: Execute static analysis (PHPStan)
-        run: composer test:analyse
-
-      - name: Execute linting (Pint - Check mode)
-        run: composer test:lint
+  quality:
+    name: PHPStan 9, coverage, mutation tests, and style
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.5'
+          extensions: mbstring, curl, dom, xml, pdo_sqlite
+          coverage: xdebug
+          tools: composer:v2
+      - run: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+      - run: composer validate --strict
+      - run: composer audit --locked
+      - run: composer test:analyse
+      - run: composer test:lint
+      - run: composer test:coverage
+        env:
+          XDEBUG_MODE: coverage
+      - run: composer test:mutate
+        env:
+          XDEBUG_MODE: coverage

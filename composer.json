@@ -3,14 +3,15 @@
     "description": "Allow your Laravel project to listen for webhooks sent from PostmarkApp.",
     "type": "laravel-package",
     "require": {
-        "php": "^8.3"
+        "php": "^8.3",
+        "laravel/framework": "^12.0 || ^13.0"
     },
     "require-dev": {
-        "larastan/larastan": "^3.9.3",
-        "laravel/pint": "^1.27",
-        "orchestra/testbench": "^10.11 || ^11.0",
-        "pestphp/pest": "^4.0",
-        "phpstan/phpstan": "^2.0"
+        "larastan/larastan": "^3.12",
+        "laravel/pint": "^1.32.1",
+        "orchestra/testbench": "^10.11 || ^11.2",
+        "pestphp/pest": "^5.1.4",
+        "phpstan/phpstan": "^2.2.13"
     },
     "license": "MIT",
     "autoload": {
@@ -36,14 +37,19 @@
             "email": "citricguy@gmail.com"
         }
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true,
     "scripts": {
-        "test": "vendor/bin/pest",
-        "test:lint": "vendor/bin/pint --test",
-        "test:analyse": "vendor/bin/phpstan analyse --memory-limit=2G",
-        "lint": "vendor/bin/pint",
-        "analyse": "vendor/bin/phpstan analyse --memory-limit=2G"
+        "test": "@php vendor/bin/pest",
+        "test:coverage": "@php vendor/bin/pest --coverage",
+        "test:mutate": [
+            "@php vendor/bin/pest --mutate --path=src/Http --covered-only --min=100 --parallel --processes=4 --filter='AuthenticationTest|PayloadTest|ListenerTest'",
+            "@php tools/check-ip-mutations.php"
+        ],
+        "test:lint": "@php vendor/bin/pint --test src tests tools",
+        "test:analyse": "@php vendor/bin/phpstan analyse --memory-limit=2G",
+        "lint": "@php vendor/bin/pint src tests tools",
+        "analyse": "@test:analyse"
     },
     "config": {
         "allow-plugins": {

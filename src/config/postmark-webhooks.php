@@ -8,6 +8,9 @@ return [
      */
     'webhook_path' => env('POSTMARK_WEBHOOK_PATH', '/api/postmark/webhook'),
 
+    // Postmark verifies HTTP 200. Set 202 only for consumers requiring the legacy response.
+    'success_status' => env('POSTMARK_WEBHOOK_SUCCESS_STATUS', 200),
+
     /*
      * By default, postmark-webhooks must come from a valid Postmark IP address and might require basic-auth.
      *

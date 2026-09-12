@@ -151,7 +151,7 @@ composer test:lint && composer test:analyse && composer test
 
 This package uses modern PHP tooling to ensure code quality:
 
-- **Pest 4** for testing
+- **Pest 5** for development testing (PHP 8.4 or 8.5)
 - **PHPStan (level 9)** with Larastan for static analysis
 - **Laravel Pint** for code formatting
 
@@ -159,6 +159,59 @@ All checks are run in CI across PHP 8.3, 8.4, and 8.5 with:
 
 - Laravel 12 + Testbench 10
 - Laravel 13 + Testbench 11
+
+See [verification results](docs/verification.md), the [maintainer tools guide](tools/README.md), and the [release runbook](docs/releasing.md).
+
+### Runtime versus development dependencies
+
+Consumers need PHP `^8.3` and Laravel `^12.0 || ^13.0`. Composer does not install this package's development dependencies into your application. Package development uses Pest 5 and normally PHP 8.5 with mbstring, curl, XML/DOM, and SQLite extensions; coverage and mutation tests also need Xdebug.
+
+The same portable, explicitly typed test classes run in all 12 latest/lowest dependency lanes. Laravel 13 on PHP 8.4/8.5 uses Pest 5. PHP 8.3 and all Laravel 12 lanes use isolated PHPUnit 12 harnesses: Pest 5 requires Symfony Process 8, whereas Testbench 10 requires Process 7. This tooling distinction does not reduce runtime support.
+
+```bash
+composer update --prefer-stable
+composer validate --strict
+composer audit --locked
+composer analyse
+composer test:lint
+composer test
+XDEBUG_MODE=coverage composer test:coverage
+XDEBUG_MODE=coverage composer test:mutate
+PHP_BINARY=php8.5 bash tools/check-matrix.sh 13 latest
+PHP_BINARY=php8.3 bash tools/check-matrix.sh 12 lowest
+```
+
+PHPStan level 9 checks source, tests, and PHP tooling without baselines, ignores, or excluded files. Coverage is reported, not used as an arbitrary acceptance percentage. Focused mutation tests check authentication, validation, dispatch, and each allowlisted IP.
+
+## Upgrading to 2.2
+
+Successful requests now return HTTP **200** with the unchanged JSON body `["success"]`, matching [Postmark's verification requirement](https://postmarkapp.com/developer/webhooks/webhooks-overview). Existing `^2.0` constraints permit this release; update the application's lock file through its normal dependency-update process.
+
+If an integration specifically requires the old 202 response, set:
+
+```dotenv
+POSTMARK_WEBHOOK_SUCCESS_STATUS=202
+```
+
+The configuration key is `postmark-webhooks.success_status`. Only integer/string 200 or 202 are accepted; explicit invalid values throw before dispatch. Older published configuration inherits the new default without republishing. Rebuild your application's configuration cache after deployment or environment changes. Prefer 200 for Postmark verification and update exact-202 tests/monitoring accordingly.
+
+### Payloads and processing guarantees
+
+Delivery, Bounce, SpamComplaint, Open, Click, and SubscriptionChange outbound webhook payloads are tested. Unknown record types continue to be accepted when required fields are valid. Postmark's separate inbound-email webhook format is not this package's supported payload contract.
+
+`RecordType` and a nonempty string `Recipient` or fallback `Email` are required. Recipient takes precedence; no new email-format validation is imposed. `MessageID` can be absent or null, including SubscriptionChange notifications. Additional nested fields remain available in the event payload. Laravel's normal request middleware still applies.
+
+The event constructor, public properties, route name, and synchronous dispatch are unchanged. Synchronous listener failures propagate before acknowledgment. Queued listeners run according to your application's queue configuration; a later queued failure cannot change a response already sent. The package adds no persistence, deduplication, tenant selection, or queue policy. Repeated deliveries dispatch repeatedly; implement idempotency in the application, and do not assume MessageID alone uniquely identifies every webhook event.
+
+Postmark documents retries for server errors, 408, and 429; other client errors may be dropped. Invalid payloads remain 422 and authentication failures remain 401. Review [Postmark's webhook guidance](https://postmarkapp.com/developer/webhooks/webhooks-overview) when designing listeners and operational alerts.
+
+### Firewall and proxy compatibility
+
+The allowlist was checked against [Postmark's webhook IP list](https://postmarkapp.com/support/article/800-ips-for-firewalls#webhooks) on September 12, 2026: `3.134.147.250`, `50.31.156.6`, `50.31.156.77`, and `18.217.206.57`. These are webhook addresses, not the SMTP ranges on that page.
+
+Enforcement remains production-only and can still be disabled with the existing switch. Basic-auth string comparisons are timing-safe; the string `"0"` now correctly counts as a credential. Ordinary absent/empty credential behavior is preserved. Configure both username and password when enabling basic auth.
+
+The package uses Laravel's trusted-proxy handling and does not change which proxies your application trusts. Only trust your actual ingress proxies; incorrectly trusting arbitrary forwarded headers can undermine IP filtering. Both trusted-proxy forwarding and untrusted spoofed headers are regression-tested. Non-production environments bypass this middleware, so staging success alone does not verify production ingress/authentication.
 
 ## Credits
 
