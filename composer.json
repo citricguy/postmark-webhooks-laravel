@@ -52,6 +52,9 @@
         "analyse": "@test:analyse"
     },
     "config": {
+        "platform": {
+            "php": "8.4.1"
+        },
         "allow-plugins": {
             "pestphp/pest-plugin": true
         }

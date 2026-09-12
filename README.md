@@ -166,6 +166,8 @@ See [verification results](docs/verification.md), the [maintainer tools guide](t
 
 Consumers need PHP `^8.3` and Laravel `^12.0 || ^13.0`. Composer does not install this package's development dependencies into your application. Package development uses Pest 5 and normally PHP 8.5 with mbstring, curl, XML/DOM, and SQLite extensions; coverage and mutation tests also need Xdebug.
 
+The root Composer configuration sets `platform.php` to `8.4.1` so development dependency updates, including Dependabot, resolve against the minimum PHP version of Pest 5 and its Symfony dependencies rather than the package's PHP 8.3 runtime minimum. Composer configuration is root-only: consuming applications retain their own platform settings and PHP 8.3 support. The isolated compatibility harnesses do not inherit this setting and continue testing their actual PHP versions. Run `composer check-platform-reqs` to verify your actual development environment as well.
+
 The same portable, explicitly typed test classes run in all 12 latest/lowest dependency lanes. Laravel 13 on PHP 8.4/8.5 uses Pest 5. PHP 8.3 and all Laravel 12 lanes use isolated PHPUnit 12 harnesses: Pest 5 requires Symfony Process 8, whereas Testbench 10 requires Process 7. This tooling distinction does not reduce runtime support.
 
 ```bash
