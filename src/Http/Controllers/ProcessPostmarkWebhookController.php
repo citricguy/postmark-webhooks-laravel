@@ -5,6 +5,7 @@ namespace Citricguy\PostmarkWebhooks\Http\Controllers;
 use Citricguy\PostmarkWebhooks\Events\PostmarkWebhookReceived;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use InvalidArgumentException;
 
 class ProcessPostmarkWebhookController
 {
@@ -21,10 +22,15 @@ class ProcessPostmarkWebhookController
         }
 
         $messageId = $this->stringValue($payload, 'MessageID');
+        $status = config('postmark-webhooks.success_status', 200);
+
+        if (! in_array($status, [200, 202, '200', '202'], true)) {
+            throw new InvalidArgumentException('postmark-webhooks.success_status must be 200 or 202.');
+        }
 
         PostmarkWebhookReceived::dispatch($email, $recordType, $messageId, $payload);
 
-        return response()->json(['success'])->setStatusCode(202);
+        return response()->json(['success'], (int) $status);
     }
 
     /**

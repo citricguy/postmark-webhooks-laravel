@@ -32,8 +32,16 @@ class VerifyPostmarkWebhookAuth
             return $next($request);
         }
 
-        if ($request->getUser() || $request->getPassword() || config('postmark-webhooks.auth_user') || config('postmark-webhooks.auth_pass')) {
-            if ($request->getUser() !== config('postmark-webhooks.auth_user') || $request->getPassword() !== config('postmark-webhooks.auth_pass')) {
+        $user = $request->getUser();
+        $password = $request->getPassword();
+        $expectedUser = config('postmark-webhooks.auth_user');
+        $expectedPassword = config('postmark-webhooks.auth_pass');
+
+        if ($this->hasCredential($user) || $this->hasCredential($password) || $this->hasCredential($expectedUser) || $this->hasCredential($expectedPassword)) {
+            $userMatches = $this->credentialsMatch($user, $expectedUser);
+            $passwordMatches = $this->credentialsMatch($password, $expectedPassword);
+
+            if (! $userMatches || ! $passwordMatches) {
                 Log::warning('Postmark webhook username/password failure! Check configuration. Attempt by: '.$request->getClientIp());
 
                 return response()->json(['error' => 'Unauthorized'], 401);
@@ -41,10 +49,25 @@ class VerifyPostmarkWebhookAuth
         }
 
         $clientIp = $request->getClientIp();
-        if ($clientIp && collect($this->webhook_ip_addresses)->contains($clientIp)) {
+        if ($clientIp !== null && in_array($clientIp, $this->webhook_ip_addresses, true)) {
             return $next($request);
         }
 
         return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    private function hasCredential(mixed $value): bool
+    {
+        // Keep legacy empty configuration behavior, but "0" is a real credential.
+        return is_string($value) ? $value !== '' : (bool) $value;
+    }
+
+    private function credentialsMatch(?string $provided, mixed $expected): bool
+    {
+        if (is_string($provided) && is_string($expected)) {
+            return hash_equals($expected, $provided);
+        }
+
+        return $provided === $expected;
     }
 }
