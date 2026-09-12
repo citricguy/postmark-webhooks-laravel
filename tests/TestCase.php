@@ -8,6 +8,13 @@ use Orchestra\Testbench\TestCase as Orchestra;
 
 abstract class TestCase extends Orchestra
 {
+    protected function application(): Application
+    {
+        self::assertInstanceOf(Application::class, $this->app);
+
+        return $this->app;
+    }
+
     /**
      * Get package providers.
      *
