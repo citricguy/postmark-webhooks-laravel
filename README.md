@@ -105,7 +105,7 @@ POSTMARK_WEBHOOK_AUTH_PASS=
 ```
 
 ## About the Firewall
-By default, the firewall is disabled unless you are in a 'production' environment. (i.e. `APP_ENV=production`).
+As of 2.3.0, the firewall is enabled by default in every environment. `APP_ENV` does not bypass authentication; the existing `POSTMARK_WEBHOOK_FIREWALL_ENABLED` setting controls enforcement.
 
 The middleware will do 'basic-auth' if configured. To use this feature, you will need to configure your Postmark webhook to include Basic auth credentials by configuring your wehbook on PostmarkApp.com.
 
@@ -118,7 +118,7 @@ POSTMARK_WEBHOOK_AUTH_PASS=<password matching webhook configuration>
 
 The middleware also confirms the source of the webhook is from PostmarkApp.com. This is done by checking the IP address of the request against the [list of IP addresses](https://postmarkapp.com/support/article/800-ips-for-firewalls#webhooks) provided by PostmarkApp.com.
 
-To disable the firewall, set `POSTMARK_WEBHOOK_FIREWALL_ENABLED=false` in your .env file or simply be in any environment except for production.
+To explicitly disable both IP and Basic Auth checks for local development or isolated tests, set `POSTMARK_WEBHOOK_FIREWALL_ENABLED=false` in that environment. Keep the firewall enabled on reachable environments receiving real callbacks.
 
 ## Testing
 
@@ -185,6 +185,14 @@ PHP_BINARY=php8.3 bash tools/check-matrix.sh 12 lowest
 
 PHPStan level 9 checks source, tests, and PHP tooling without baselines, ignores, or excluded files. Coverage is reported, not used as an arbitrary acceptance percentage. Focused mutation tests check authentication, validation, dispatch, and each allowlisted IP.
 
+## Upgrading to 2.3
+
+The existing firewall switch now applies in all environments, including local, testing, staging, and custom names. This intentional non-production behavior change is included in the 2.3.0 minor release; production checks are unchanged. Existing `^2.0` constraints allow the update.
+
+Before updating a development or staging application, review `POSTMARK_WEBHOOK_FIREWALL_ENABLED`. Keep it enabled for real Postmark callbacks. Set it explicitly to `false` for isolated tests or local fixtures that intentionally bypass authentication. No new variables or republished configuration are required. Rebuild configuration caches after configuration changes.
+
+See the [2.3.0 release notes](docs/releases/v2.3.0.md) and [release runbook](docs/releasing.md). Event and payload contracts, response status settings, and supported PHP/Laravel versions remain unchanged.
+
 ## Upgrading to 2.2
 
 Successful requests now return HTTP **200** with the unchanged JSON body `["success"]`, matching [Postmark's verification requirement](https://postmarkapp.com/developer/webhooks/webhooks-overview). Existing `^2.0` constraints permit this release; update the application's lock file through its normal dependency-update process.
@@ -211,9 +219,9 @@ Postmark documents retries for server errors, 408, and 429; other client errors 
 
 The allowlist was checked against [Postmark's webhook IP list](https://postmarkapp.com/support/article/800-ips-for-firewalls#webhooks) on September 12, 2026: `3.134.147.250`, `50.31.156.6`, `50.31.156.77`, and `18.217.206.57`. These are webhook addresses, not the SMTP ranges on that page.
 
-Enforcement remains production-only and can still be disabled with the existing switch. Basic-auth string comparisons are timing-safe; the string `"0"` now correctly counts as a credential. Ordinary absent/empty credential behavior is preserved. Configure both username and password when enabling basic auth.
+Starting with 2.3.0, enforcement applies in every environment and can still be disabled with the existing switch. Basic-auth string comparisons are timing-safe; the string `"0"` now correctly counts as a credential. Ordinary absent/empty credential behavior is preserved. Configure both username and password when enabling basic auth.
 
-The package uses Laravel's trusted-proxy handling and does not change which proxies your application trusts. Only trust your actual ingress proxies; incorrectly trusting arbitrary forwarded headers can undermine IP filtering. Both trusted-proxy forwarding and untrusted spoofed headers are regression-tested. Non-production environments bypass this middleware, so staging success alone does not verify production ingress/authentication.
+The package uses Laravel's trusted-proxy handling and does not change which proxies your application trusts. Only trust your actual ingress proxies; incorrectly trusting arbitrary forwarded headers can undermine IP filtering. Both trusted-proxy forwarding and untrusted spoofed headers are regression-tested. Staging exercises the same checks when the firewall is enabled. Its own ingress/proxy and authentication settings still need to be correct.
 
 ## Credits
 

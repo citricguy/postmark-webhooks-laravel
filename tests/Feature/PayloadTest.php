@@ -15,6 +15,7 @@ class PayloadTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->withServerVariables(['REMOTE_ADDR' => '18.217.206.57']);
         Event::fake([PostmarkWebhookReceived::class]);
     }
 

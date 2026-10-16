@@ -46,7 +46,7 @@ $manifest = [
         'options' => [
             'symlink' => true,
             // A fixture-only stable version lets us verify the real ^2.0 constraint.
-            'versions' => ['citricguy/postmark-webhooks-laravel' => '2.2.0'],
+            'versions' => ['citricguy/postmark-webhooks-laravel' => '2.3.0'],
         ],
     ]],
     'autoload-dev' => ['psr-4' => ['Citricguy\\PostmarkWebhooks\\Tests\\' => $root.'/tests/']],

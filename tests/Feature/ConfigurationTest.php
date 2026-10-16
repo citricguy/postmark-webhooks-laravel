@@ -20,6 +20,12 @@ class ConfigurationTest extends TestCase
     /** @var list<string> */
     private array $createdFiles = [];
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withServerVariables(['REMOTE_ADDR' => '18.217.206.57']);
+    }
+
     protected function tearDown(): void
     {
         try {
@@ -107,6 +113,19 @@ class ConfigurationTest extends TestCase
         file_put_contents($path, "<?php\nreturn ['webhook_path' => '/existing'];\n");
         self::assertSame(0, Artisan::call('vendor:publish', ['--provider' => PostmarkWebhooksServiceProvider::class, '--tag' => 'config']));
         self::assertSame("<?php\nreturn ['webhook_path' => '/existing'];\n", file_get_contents($path));
+    }
+
+    public function test_existing_environment_switch_explicitly_disables_the_firewall(): void
+    {
+        $this->setEnvironment('POSTMARK_WEBHOOK_FIREWALL_ENABLED', 'false');
+        $this->setEnvironment('POSTMARK_WEBHOOK_AUTH_USER', 'required');
+        $this->setEnvironment('POSTMARK_WEBHOOK_AUTH_PASS', 'required');
+        $this->refreshApplication();
+        Event::fake([PostmarkWebhookReceived::class]);
+        self::assertFalse(config('postmark-webhooks.firewall_enabled'));
+        $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.10'])
+            ->postJson('/api/postmark/webhook', Payloads::delivery())->assertOk();
+        Event::assertDispatchedTimes(PostmarkWebhookReceived::class, 1);
     }
 
     public function test_old_published_configuration_inherits_new_default(): void

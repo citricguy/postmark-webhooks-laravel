@@ -27,7 +27,7 @@ class VerifyPostmarkWebhookAuth
      */
     public function handle(Request $request, Closure $next): mixed
     {
-        if (! app()->environment('production') || ! config('postmark-webhooks.firewall_enabled')) {
+        if (! config('postmark-webhooks.firewall_enabled')) {
             // Bypass the middleware and proceed with the request
             return $next($request);
         }

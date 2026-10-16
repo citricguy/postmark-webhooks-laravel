@@ -14,8 +14,8 @@ return [
     /*
      * By default, postmark-webhooks must come from a valid Postmark IP address and might require basic-auth.
      *
-     * This is disabled by default if you are not in a production environment, however, you can disable IP and
-     * basic-auth checks in production by setting this to false.
+     * This applies in every environment. Set this to false to explicitly disable both checks,
+     * including for local development or isolated tests.
      */
     'firewall_enabled' => env('POSTMARK_WEBHOOK_FIREWALL_ENABLED', true),
 

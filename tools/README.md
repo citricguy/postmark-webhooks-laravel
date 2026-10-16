@@ -23,7 +23,7 @@ PHP_BINARY=php8.3 bash tools/check-matrix.sh 12 latest
 
 Repeat with PHP 8.3/8.4/8.5, Laravel 12/13, and latest/lowest to reproduce the 12 CI lanes. Optionally set `COMPOSER_BINARY` to your Composer PHP executable/PHAR. The selected PHP must have all required extensions; this does not install or alter system PHP. Resolution downloads public dependencies and writes Composer's normal cache. Each lane has independent vendor and lock files and leaves the root manifest/lock unchanged.
 
-PHP 8.5/Laravel 13 additionally checks Symfony HTTP Client and Postmark Mailer `^8.1`. The generated package version `2.2.0` is a fixture-only path-repository alias to test a consumer's `^2.0` constraint; it publishes nothing. Latest/lowest means the latest/lowest currently resolvable secure stable set within the harness constraints, not a promise to install historical vulnerable versions.
+PHP 8.5/Laravel 13 additionally checks Symfony HTTP Client and Postmark Mailer `^8.1`. The generated package version `2.3.0` is a fixture-only path-repository alias to test a consumer's `^2.0` constraint; it publishes nothing. Latest/lowest means the latest/lowest currently resolvable secure stable set within the harness constraints, not a promise to install historical vulnerable versions.
 
 For root quality checks, install development dependencies on PHP 8.4/8.5 first (PHP 8.5 recommended). Xdebug coverage is needed for mutation testing:
 

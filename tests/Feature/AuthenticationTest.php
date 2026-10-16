@@ -116,21 +116,43 @@ class AuthenticationTest extends TestCase
         Event::assertDispatchedTimes(PostmarkWebhookReceived::class, 1);
     }
 
-    /** @return iterable<string, array{string, bool}> */
-    public static function bypasses(): iterable
+    /** @return iterable<string, array{string}> */
+    public static function environments(): iterable
     {
-        yield 'local' => ['local', true];
-        yield 'testing' => ['testing', true];
-        yield 'staging' => ['staging', true];
-        yield 'production disabled' => ['production', false];
+        foreach (['production', 'local', 'testing', 'staging', 'preview'] as $environment) {
+            yield $environment => [$environment];
+        }
     }
 
-    #[DataProvider('bypasses')]
-    public function test_existing_firewall_bypasses_skip_both_checks(string $environment, bool $enabled): void
+    /** @return iterable<string, array{string, string, ?string, ?string, int}> */
+    public static function environmentAuthentication(): iterable
+    {
+        foreach (self::environments() as [$environment]) {
+            yield $environment.' valid identity' => [$environment, '18.217.206.57', 'user', 'secret', 200];
+            yield $environment.' invalid source' => [$environment, '203.0.113.10', 'user', 'secret', 401];
+            yield $environment.' invalid credentials' => [$environment, '18.217.206.57', 'user', 'wrong', 401];
+            yield $environment.' missing credentials' => [$environment, '18.217.206.57', null, null, 401];
+        }
+    }
+
+    #[DataProvider('environmentAuthentication')]
+    public function test_enabled_firewall_checks_identity_in_every_environment(string $environment, string $ip, ?string $user, ?string $password, int $status): void
     {
         $this->application()->instance('env', $environment);
-        config(['postmark-webhooks.firewall_enabled' => $enabled, 'postmark-webhooks.auth_user' => 'required', 'postmark-webhooks.auth_pass' => 'required']);
-        $this->postJson('/api/postmark/webhook', Payloads::delivery())->assertOk();
+        self::assertTrue(config('postmark-webhooks.firewall_enabled'));
+        config(['postmark-webhooks.auth_user' => 'user', 'postmark-webhooks.auth_pass' => 'secret']);
+        $this->withServerVariables(['REMOTE_ADDR' => $ip, 'PHP_AUTH_USER' => $user, 'PHP_AUTH_PW' => $password])
+            ->postJson('/api/postmark/webhook', Payloads::delivery())->assertStatus($status);
+        Event::assertDispatchedTimes(PostmarkWebhookReceived::class, $status === 200 ? 1 : 0);
+    }
+
+    #[DataProvider('environments')]
+    public function test_explicitly_disabled_firewall_skips_both_checks_in_every_environment(string $environment): void
+    {
+        $this->application()->instance('env', $environment);
+        config(['postmark-webhooks.firewall_enabled' => false, 'postmark-webhooks.auth_user' => 'required', 'postmark-webhooks.auth_pass' => 'required']);
+        $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.10', 'PHP_AUTH_USER' => 'wrong', 'PHP_AUTH_PW' => 'wrong'])
+            ->postJson('/api/postmark/webhook', Payloads::delivery())->assertOk();
         Event::assertDispatchedTimes(PostmarkWebhookReceived::class, 1);
     }
 
